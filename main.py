@@ -29,16 +29,24 @@ def get_angle_pixel_coordinates(matrix, angle):
     # Calculate the x and y coordinates of the pixel for the given angle
     x = int(center_x + radius * np.cos(angle_rad))
     y = int(center_y + radius * np.sin(angle_rad))
+
+    print(x, y)
     
     return x, y
 
 def draw_circle(matrix):
+    center_x, center_y = matrix.shape[1] // 2, matrix.shape[0] // 2
+    radius = min(center_x, center_y)
+
     for i in range(0, 360):
-        x, y = get_angle_pixel_coordinates(matrix, i)
+        angle_rad = np.deg2rad(i)
+        x = int(center_x + radius * np.cos(angle_rad))
+        y = int(center_y + radius * np.sin(angle_rad))
         if 0 <= y < matrix.shape[0] and 0 <= x < matrix.shape[1]:
             matrix[y, x] = 0
-    
+
     return matrix
+
 
 def draw_line(matrix, start_x, start_y, end_x, end_y):
     # DONE başta siyah üzerine beyaz çiziyormuşum onları düzenledim

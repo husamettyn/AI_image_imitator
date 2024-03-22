@@ -84,9 +84,8 @@ def draw_path(matrix, path):
     return matrix
 
 
-def initpath(path_number):
+def initpath():
     path = list(range(360))
-    random.shuffle(path)
     return path
 
 
@@ -114,16 +113,16 @@ def mutate(path, mutation_rate):
 
 
 if __name__ == "__main__":
-    target_image_path = "images/5.png"
+    target_image_path = "images/1.png"
     matrix, target_image = create_circle_matrix(target_image_path)
     matrix = draw_circle(matrix)
 
     population_size = 100
     mutation_rate = 0.01
-    generations = 10000
+    generations = 100
 
     # Initialize population
-    population = [initpath(360) for _ in range(population_size)]
+    population = [initpath() for _ in range(population_size)]
 
     for generation in range(generations):
         # Evaluate fitness of each path in the population

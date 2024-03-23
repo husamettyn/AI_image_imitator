@@ -85,9 +85,18 @@ def draw_path(matrix, path):
 
 
 def initpath(path_number):
-    path = list(range(360))
-    random.shuffle(path)
+    # Initialize a path with random angles
+    path = []
+    angle = random.randint(0, 359)
+    path.append(angle)
+    for i in range(1, path_number):
+        previous_angle = path[i - 1]
+        angle = random.randint(0, 359)
+        while angle == previous_angle:
+            angle = random.randint(0, 359)
+        path.append(angle)
     return path
+
 
 
 def fitness(image1, image2):
@@ -114,16 +123,16 @@ def mutate(path, mutation_rate):
 
 
 if __name__ == "__main__":
-    target_image_path = "images/5.png"
+    target_image_path = "images/1.png"
     matrix, target_image = create_circle_matrix(target_image_path)
     matrix = draw_circle(matrix)
 
     population_size = 100
     mutation_rate = 0.01
-    generations = 10000
+    generations = 100
 
     # Initialize population
-    population = [initpath(360) for _ in range(population_size)]
+    population = [initpath(500) for _ in range(population_size)]
 
     for generation in range(generations):
         # Evaluate fitness of each path in the population

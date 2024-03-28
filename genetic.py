@@ -68,6 +68,8 @@ def initpath(path_number):
         path.append(angle)
     return path
 
+
+
 def calc_fit(image, normalized_image):
     hamming_distance = np.sum(image != normalized_image)
     return hamming_distance

@@ -122,17 +122,32 @@ def mutate(path, mutation_rate):
     return mutated_path
 
 
+
+
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     target_image_path = "images/2.png"
     matrix, target_image = create_circle_matrix(target_image_path)
-    matrix = draw_circle(matrix)
 
     population_size = 100
     mutation_rate = 0.01
     generations = 100
 
+    population = []
     # Initialize population
-    population = [initpath(100) for _ in range(population_size)]
+    for i in range(population_size):
+        path = initpath(200)
+        population.append(path)
+        print(i)
+        print(path)
+
 
     for generation in range(generations):
         # Evaluate fitness of each path in the population
@@ -157,6 +172,8 @@ if __name__ == "__main__":
     best_path = min(population, key=lambda path: fitness(draw_path(matrix.copy(), path), target_image))
 
     # Draw the best path
+    #make high numbers higher low number lower on matrix
+
     best_image = draw_path(matrix.copy(), best_path)
     image = Image.fromarray(best_image)
     image.show()

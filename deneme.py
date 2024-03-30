@@ -198,7 +198,7 @@ if __name__ == "__main__":
 
     # Save the normalized image with the unique name
     timestamp = time.strftime("%Y%m%d%H%M%S")
-    normalized_image_name = f"normalized_image_{timestamp}.png"
+    normalized_image_name = f"{target_image_path}_{timestamp}.png"
     normalized_image.save(normalized_image_name)
 
     # Show the normalized image

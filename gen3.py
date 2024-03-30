@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 
 def create_circle_matrix(image_path):
@@ -121,19 +122,22 @@ def mutate(path, mutation_rate):
             mutated_path[i] = random.randint(0, 359)
     return mutated_path
 
-
-
-
-
-
-
-
-
-
-
+def output(best_path, show_plot=True, show_image=True):
+    best_image = draw_path(matrix.copy(), best_path)
+    image = Image.fromarray(best_image)
+    if show_plot:
+        plt.figure()
+        for i in range(population_size):
+            plt.plot(range(generations), [fitness_scores[i] for fitness_scores in fitness_scores_history],
+            label=f"Path {i + 1}")
+        plt.xlabel("Generation")
+        plt.ylabel("Fitness (Hamming Distance)")
+        plt.title("Fitness Score over Generations")
+        plt.legend()
+        plt.show()
 
 if __name__ == "__main__":
-    target_image_path = "images/2.png"
+    target_image_path = "images/6.png"
     matrix, target_image = create_circle_matrix(target_image_path)
 
     population_size = 100
@@ -143,21 +147,25 @@ if __name__ == "__main__":
     population = []
     # Initialize population
     for i in range(population_size):
-        path = initpath(200)
+        path = initpath(50)
         population.append(path)
         print(i)
         print(path)
 
 
+    fitness_scores_history = []
+
     for generation in range(generations):
         # Evaluate fitness of each path in the population
         fitness_scores = [fitness(draw_path(matrix.copy(), path), target_image) for path in population]
-
+        fitness_scores_history.append(fitness_scores)
         # Select paths based on their fitness
         selected_paths = [population[i] for i in np.argsort(fitness_scores)[:population_size // 2]]
+        previous_best_path = min(population, key=lambda path: fitness(draw_path(matrix.copy(), path), target_image))
 
         # Create new paths through crossover
         new_population = []
+
         while len(new_population) < population_size:
             path1 = random.choice(selected_paths)
             path2 = random.choice(selected_paths)
@@ -168,6 +176,9 @@ if __name__ == "__main__":
         population = [mutate(path, mutation_rate) for path in new_population]
         print(f"Generation {generation} best fitness: {min(fitness_scores)}")
 
+        #prevent having worse path than previous generation
+        population.append(previous_best_path)
+
     # Get the best path (image) from the final population
     best_path = min(population, key=lambda path: fitness(draw_path(matrix.copy(), path), target_image))
 
@@ -177,3 +188,4 @@ if __name__ == "__main__":
     best_image = draw_path(matrix.copy(), best_path)
     image = Image.fromarray(best_image)
     image.show()
+    output(best_path, show_plot=True, show_image=True)

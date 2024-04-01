@@ -1,2 +1,5 @@
-numpy
+numpy~=1.26.4
 PIL
+pillow~=10.2.0
+matplotlib~=3.8.3
+opencv-python~=4.9.0.80

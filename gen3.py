@@ -2,6 +2,7 @@ from PIL import Image
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import time
 
 
 def create_circle_matrix(image_path):
@@ -99,7 +100,6 @@ def initpath(path_number):
     return path
 
 
-
 def fitness(image1, image2):
     # Calculate Mean Squared Error (MSE) between two images
     return np.mean((image1 - image2) ** 2)
@@ -122,22 +122,52 @@ def mutate(path, mutation_rate):
             mutated_path[i] = random.randint(0, 359)
     return mutated_path
 
-def output(best_path, show_plot=True, show_image=True):
+
+def output(best_path, save_image=True, show_plot=True, show_image=True):
+    # Draw the best path
     best_image = draw_path(matrix.copy(), best_path)
-    image = Image.fromarray(best_image)
+
+    normalized_image = (best_image - np.min(best_image)) / (np.max(best_image) - np.min(best_image)) * 255
+    normalized_image = normalized_image.astype(np.uint8)
+    # Convert the normalized image array to PIL Image
+    normalized_image = Image.fromarray(normalized_image)
+
+    if save_image:
+        # Save the normalized image with the unique name
+        timestamp = time.strftime("%Y%m%d%H%M%S")
+        normalized_image_name = f"{target_image_path}_{timestamp}.png"
+        normalized_image.save(normalized_image_name)
+
+    # Show the normalized image
+    if show_image:
+        normalized_image.show()
+
+    plt.ioff()  # Interaktif modu kapat
+    # Plot fitness scores over generations
     if show_plot:
         plt.figure()
         for i in range(population_size):
-            plt.plot(range(generations), [fitness_scores[i] for fitness_scores in fitness_scores_history],
-            label=f"Path {i + 1}")
+            plt.plot(range(generations), [fitness_scores[i] for fitness_scores in fitness_scores_history])
         plt.xlabel("Generation")
         plt.ylabel("Fitness (Hamming Distance)")
         plt.title("Fitness Score over Generations")
         plt.legend()
         plt.show()
 
+
+def update_plot(ax, best_image_with_real, generation):
+    """
+    Grafik güncelleme işlemlerini yürüten fonksiyon.
+    """
+    ax.clear()  # Mevcut çizimi temizle
+    ax.imshow(best_image_with_real, cmap='gray')
+    ax.set_title(f"Generation {generation}")
+    plt.draw()
+    plt.pause(0.1)  # Grafik güncellemesi için kısa bir mola ver
+
+
 if __name__ == "__main__":
-    target_image_path = "images/6.png"
+    target_image_path = "images/2.png"
     matrix, target_image = create_circle_matrix(target_image_path)
 
     population_size = 100
@@ -147,15 +177,17 @@ if __name__ == "__main__":
     population = []
     # Initialize population
     for i in range(population_size):
-        path = initpath(50)
+        path = initpath(200)
         population.append(path)
-        print(i)
-        print(path)
 
+    fig, ax = plt.subplots()  # Create a figure and axis for the plot
+    plt.ion()  # Turn on interactive mode for continuous updating
 
     fitness_scores_history = []
+    generation_times = []
 
     for generation in range(generations):
+        start_time = time.time()
         # Evaluate fitness of each path in the population
         fitness_scores = [fitness(draw_path(matrix.copy(), path), target_image) for path in population]
         fitness_scores_history.append(fitness_scores)
@@ -175,17 +207,27 @@ if __name__ == "__main__":
         # Mutate new population
         population = [mutate(path, mutation_rate) for path in new_population]
         print(f"Generation {generation} best fitness: {min(fitness_scores)}")
+        end_time = time.time()
+        generation_time = end_time - start_time
+        print(f"\ttime: {round(generation_time, 3)} seconds")
+        generation_times.append(generation_time)
 
-        #prevent having worse path than previous generation
+        # prevent having worse path than previous generation
         population.append(previous_best_path)
+
+        if generation % 5 == 0:
+            # Get the best path (image) from the final population
+            best_path = min(population, key=lambda path: fitness(draw_path(matrix.copy(), path), target_image))
+
+            best_image_with_real = draw_path(matrix.copy(), best_path)
+            best_image_with_real[target_image != 255] = 200
+
+            update_plot(ax, best_image_with_real, generation)
+
 
     # Get the best path (image) from the final population
     best_path = min(population, key=lambda path: fitness(draw_path(matrix.copy(), path), target_image))
 
     # Draw the best path
-    #make high numbers higher low number lower on matrix
 
-    best_image = draw_path(matrix.copy(), best_path)
-    image = Image.fromarray(best_image)
-    image.show()
-    output(best_path, show_plot=True, show_image=True)
+    output(best_path, show_plot=True, show_image=True, save_image=False)

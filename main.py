@@ -147,17 +147,14 @@ def output(best_path, save_image=True, show_plot=True, show_image=True):
     if show_plot:
         plt.figure()
         for i in range(population_size):
-            plt.plot(range(generations), [fitness_scores[i] for fitness_scores in fitness_scores_history], label=f"Path {i + 1}")
+            plt.plot(range(generations), [fitness_scores[i] for fitness_scores in fitness_scores_history])
         plt.xlabel("Generation")
-        plt.ylabel("Fitness (Hamming Distance)")
+        plt.ylabel("Fitness")
         plt.title("Fitness Score over Generations")
         plt.legend()
         plt.show()
 
 def update_plot(ax, best_image_with_real, generation):
-    """
-    Grafik güncelleme işlemlerini yürüten fonksiyon.
-    """
     ax.clear()  # Mevcut çizimi temizle
     ax.imshow(best_image_with_real, cmap='gray')
     ax.set_title(f"Generation {generation}")
@@ -166,7 +163,7 @@ def update_plot(ax, best_image_with_real, generation):
 
 
 if __name__ == "__main__":
-    target_image_path = "images/6.png"
+    target_image_path = "images/adam.png"
     matrix, target_image = create_circle_matrix(target_image_path)
 
     population_size = 20
@@ -205,6 +202,7 @@ if __name__ == "__main__":
 
         # Mutate new population
         population = [mutate(path, mutation_rate) for path in new_population]
+        
         print(f"Generation {generation} best fitness: {min(fitness_scores)}")
         end_time = time.time()
         generation_time = end_time - start_time
